@@ -1,40 +1,16 @@
-# import sys
-# from slack_sdk import WebClient
-# from slack_sdk.errors import SlackApiError
-#
-# # Replace with your bot's token
-# slack_token = "xoxb-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # Replace with your bot token
-# channel_id = "C080RQL464D"  # Replace with the actual channel ID
-# client = WebClient(token=slack_token)
-#
-#
-# def send_slack_notification(remote_ip, local_ip):
-#     try:
-#         response = client.chat_postMessage(
-#             channel=channel_id,
-#             text=f"Remote connection from IP: {remote_ip} to local PC with IP: {local_ip}"
-#         )
-#         print(f"Notification sent to Slack channel {channel_id}")
-#     except SlackApiError as e:
-#         print(f"Error sending message to Slack: {e.response['error']}")
-#
-#
-# if __name__ == "__main__":
-#     remote_ip = sys.argv[1]  # First argument: remote IP
-#     local_ip = sys.argv[2]  # Second argument: local IP
-#     send_slack_notification(remote_ip, local_ip)
-
-
+import json
 import sys
 import socket
 import subprocess
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-# Replace with your bot's token
-slack_token = "xoxb-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # Replace with your bot token
-channel_id = "C080RQL464D"  # Replace with the actual channel ID
-client = WebClient(token=slack_token)
+# configs = json.load(open(r"C:\project_configs\slack_configs.json", 'r'))
+#
+# # Replace with your bot's token
+# slack_token = configs['slack_token']  # Replace with your bot token
+# channel_id = configs['channel_id']  # Replace with the actual channel ID
+# client = WebClient(token=slack_token)
 
 
 def get_local_ip():
@@ -78,7 +54,7 @@ def get_remote_details():
     """Fetch details about remote IP and username using 'qwinsta' and 'netstat'."""
     try:
         # Fetch active sessions
-        qwinsta_result = subprocess.run(['qwinsta'], capture_output=True, text=True, check=True)
+        qwinsta_result = subprocess.run(args=['qwinsta'], capture_output=True, text=True, check=True)
         session_info = None
 
         # Parse qwinsta output
@@ -113,7 +89,7 @@ def get_remote_details():
 def send_slack_notification(remote_ip, remote_username, local_ip, local_user):
     """Send a notification to Slack."""
     try:
-        client.chat_postMessage(
+        response = client.chat_postMessage(
             channel=channel_id,
             text=f"📡 **Remote Connection Alert**\n"
                  f"👤 Remote User: {local_user}\n"
@@ -131,6 +107,6 @@ if __name__ == "__main__":
     remote_ip, remote_username = get_remote_details()
     print(local_ip, local_username)
     print(remote_ip, remote_username)
-    res = subprocess.run('netstat', capture_output=True)
-    print(res)
-    send_slack_notification(remote_ip=remote_ip, remote_username=remote_username, local_ip=local_ip, local_user=local_username)
+    # res = subprocess.run('netstat', capture_output=True)
+    # print(res)
+    # send_slack_notification(remote_ip=remote_ip, remote_username=remote_username, local_ip=local_ip, local_user=local_username)
